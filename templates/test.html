@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SocketIO Client</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+
+</head>
+<body>
+    <input type="text" id="user_id" placeholder="Введите ваш User ID">
+    <button id="connect">Подключиться</button>
+
+    <div id="main">
+        <div id="id2">
+           <span class="class2"> Текст2 </span>
+       </div>
+   </div>
+
+<script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let socket = io();  // Установление соединения с сервером
+
+            document.getElementById('connect').addEventListener('click', function() {
+                const userId = document.getElementById('user_id').value; // Получение user_id (Передаем его после авторизации пользователя)
+                if (!userId) {
+                    alert('введите User ID');
+                    return;
+                }
+                socket.emit('connect_user', { user_id: userId });  // Отправка события для подключения пользователя
+
+                // Обработка подтверждения подключения
+                socket.on('connected', function(data) {
+                    console.log('Connected:', data);
+                });
+
+                // Обработка входящих сообщений
+                socket.on('message', function(data) {
+                <!--  alert(data.message);  -->
+                var main= document.getElementById("main");
+                var div = document.createElement("div");
+                div.textContent = data.message;
+                main.appendChild(div);
+                console.log(data.message);
+                });
+            });
+        });
+
+    // Функция для получения уведомлений
+function fetchNotifications() {
+    const userId = 'your_user_id_here'; // Установите ваш User-Id здесь
+
+    // Выполнение GET запроса к серверу
+    fetch('/get_app_notification', {
+        method: 'GET', // Метод HTTP запроса
+        headers: {
+            'Content-Type': 'application/json', // Тип содержимого
+            'User-Id': 123 // Передача User-Id в заголовках запроса
+        }
+    })
+    .then(response => {
+        // Проверка статуса ответа
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Разбор тела ответа как JSON
+    })
+    .then(data => {
+        console.log('Notifications:', data); // Вывод уведомлений в консоль
+
+        // Если необходимо, здесь можно добавить код для отображения уведомлений на странице
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+    });
+}
+
+// Вызов функции для получения уведомлений
+fetchNotifications();
+
+
+    </script>
+</body>
+</html>
